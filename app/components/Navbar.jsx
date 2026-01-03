@@ -3,10 +3,14 @@
 import Image from "next/image.js";
 import { useEffect, useRef, useState } from "react";
 import { assets } from "../assets /assets.js";
+import { useAdmin } from "../context/AdminContext";
+import { LogIn, LayoutDashboard } from "lucide-react";
+import Link from "next/link";
 
 const Navbar = () => {
   const [isScroll, setIsScroll]=useState(false)
   const sideMenuRef = useRef(null);
+  const { isAuthenticated } = useAdmin();
 
   const openMenu = () => {
     if (sideMenuRef.current) {
@@ -50,16 +54,34 @@ const Navbar = () => {
   ${isScroll ? "transparent bg-opacity-50 backdrop-blur-lg shadow-sm" : ""}`}
 >
 
-        {/* Logo */}
-        <a href="#top">
-          <Image
-            src={assets.logo}
-            alt="logo"
-            width={120}
-            height={40}
-            className="w-28 cursor-pointer mr-14"
-          />
-        </a>
+        {/* Logo and Login */}
+        <div className="flex items-center gap-4">
+          <a href="#top">
+            <Image
+              src={assets.logo}
+              alt="logo"
+              width={120}
+              height={40}
+              className="w-28 cursor-pointer"
+            />
+          </a>
+          <Link
+            href={isAuthenticated ? "/admin/dashboard" : "/admin/login"}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#6A9457] text-white hover:bg-[#5b8b49] transition-colors text-sm font-medium shadow-md hover:shadow-lg"
+          >
+            {isAuthenticated ? (
+              <>
+                <LayoutDashboard className="w-4 h-4" />
+                Dashboard
+              </>
+            ) : (
+              <>
+                <LogIn className="w-4 h-4" />
+                Login
+              </>
+            )}
+          </Link>
+        </div>
 
         {/* Desktop menu */}
         <ul className={`hidden font-ovo md:flex items-center gap-6 lg:gap-8 px-12 py-3 rounded-full ${isScroll ? "transparent bg-opacity-50 backdrop-blur-lg shadow-sm" : ""} shadow-sm bg-opacity-5`}>
@@ -144,6 +166,25 @@ const Navbar = () => {
             <li><a onClick={closeMenu} href="#services">Services</a></li>
             <li><a onClick={closeMenu} href="#work">My Work</a></li>
             <li><a onClick={closeMenu} href="#contact">Contact Me</a></li>
+            <li className="mt-4">
+              <Link
+                href={isAuthenticated ? "/admin/dashboard" : "/admin/login"}
+                onClick={closeMenu}
+                className="flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-[#6A9457] text-white hover:bg-[#5b8b49] transition-colors font-medium"
+              >
+                {isAuthenticated ? (
+                  <>
+                    <LayoutDashboard className="w-4 h-4" />
+                    Dashboard
+                  </>
+                ) : (
+                  <>
+                    <LogIn className="w-4 h-4" />
+                    Login
+                  </>
+                )}
+              </Link>
+            </li>
           </ul>
         </div>
       </nav>

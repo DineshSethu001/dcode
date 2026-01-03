@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Outfit, Ovo } from "next/font/google";
 import "./globals.css";
+import { AdminProvider } from "./context/AdminContext";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -30,7 +31,9 @@ export default function RootLayout({
       className="scroll-smooth"
     >
       <body className={`${outfit.variable} ${ovo.variable} font-outfit overflow-x-hidden antialiased`}>
-        {children}
+        <AdminProvider>
+          {children}
+        </AdminProvider>
       </body>
     </html>
   );

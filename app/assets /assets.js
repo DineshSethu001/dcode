@@ -1,4 +1,3 @@
-import user_image from './user-image.png';
 import code_icon from './code-icon.png';
 import code_icon_dark from './code-icon-dark.png';
 import edu_icon from './edu-icon.png';
@@ -42,7 +41,7 @@ import express from "./express.png"
 import react from "./react.png"
 import node from "./node.png"
 export const assets = {
-    user_image,
+    
     author,
     mongo,
     express,
@@ -94,7 +93,7 @@ export const workData = [
         bgImage: '/work-1.png',
     },
     {
-        title: 'Geo based app',
+        title: 'Geo based app', 
         description: 'Mobile App',
         bgImage: '/work-2.png',
     },
