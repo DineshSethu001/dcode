@@ -233,20 +233,30 @@ export default function AdminDashboard() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Image URL *
-                </label>
-                <input
-                  type="text"
-                  value={formData.image}
-                  onChange={(e) =>
-                    setFormData({ ...formData, image: e.target.value })
-                  }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6A9457] outline-none"
-                  placeholder="Enter image URL or path"
-                  required
-                />
-              </div>
+  <label className="block text-sm font-medium text-gray-700 mb-2">
+    Upload Image *
+  </label>
+  <input
+    type="file"
+    accept="image/*"
+    onChange={(e) => {
+      const file = e.target.files[0];
+      if (file) {
+        // Create a local URL for preview or store the file object
+        setFormData({ ...formData, image: URL.createObjectURL(file), file });
+      }
+    }}
+    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6A9457] outline-none"
+    required
+  />
+  {formData.image && (
+    <img
+      src={formData.image}
+      alt="Preview"
+      className="mt-2 w-32 h-32 object-cover rounded-md"
+    />
+  )}
+</div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">

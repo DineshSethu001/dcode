@@ -1,84 +1,183 @@
 "use client";
 
-import assets from "../assets /assets";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import assets from "../assets /assets";
+
+/* ---------------- Animations ---------------- */
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+};
+
+const toastAnim = {
+  hidden: { opacity: 0, y: 30, scale: 0.95 },
+  visible: { opacity: 1, y: 0, scale: 1 },
+  exit: { opacity: 0, y: 30, scale: 0.95 },
+};
+
+/* ---------------- Magnetic Button Hook ---------------- */
+
+const useMagnetic = () => {
+  const ref = useRef(null);
+
+  const handleMove = (e) => {
+    const el = ref.current;
+    if (!el) return;
+
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+
+    el.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px)`;
+  };
+
+  const reset = () => {
+    if (ref.current) ref.current.style.transform = "translate(0,0)";
+  };
+
+  return { ref, handleMove, reset };
+};
 
 function Contact() {
-  const [result, setResult] = useState("");
+  const [toast, setToast] = useState(null);
+  const magnetic = useMagnetic();
 
   const onSubmit = async (event) => {
     event.preventDefault();
-    setResult("Sending...");
+    setToast({ type: "loading", message: "Sending..." });
 
     const formData = new FormData(event.target);
     formData.append("access_key", process.env.NEXT_PUBLIC_WEB3FORMS_KEY);
 
-    const response = await fetch("https://api.web3forms.com/submit", {
+    const res = await fetch("https://api.web3forms.com/submit", {
       method: "POST",
       body: formData,
     });
 
-    const data = await response.json();
+    const data = await res.json();
 
     if (data.success) {
-      setResult("Form Submitted Successfully");
+      setToast({ type: "success", message: "Message sent successfully 🚀" });
       event.target.reset();
     } else {
-      console.error("Error submitting form:", data);
-      setResult(data.message || "Something went wrong. Please try again.");
+      setToast({ type: "error", message: "Something went wrong ❌" });
     }
+
+    setTimeout(() => setToast(null), 3000);
   };
 
   return (
-    <div
+    <section
       id="contact"
-      className="bg-[#F6F5F2] w-full px-[12%] py-10 scroll-mt-20"
+      className="relative overflow-hidden bg-[#F6F5F2] px-[12%] py-20"
     >
-      <h4 className="text-center text-lg mb-2 font-ovo">Connect With Me</h4>
-      <h2 className="text-center text-4xl">Get In Touch</h2>
-      <p className="mt-5 mb-12 font-ovo mx-auto max-w-2xl text-center">
-        I'd love to hear from you! If you have any question, comments, or
-        feedback, please use the form below.
-      </p>
+      {/* 🌊 Animated Background Blobs */}
+      <motion.div
+        className="absolute top-[-100px] left-[-100px] w-[300px] h-[300px] bg-[#6A9457]/20 rounded-full blur-3xl"
+        animate={{ x: [0, 40, 0], y: [0, 30, 0] }}
+        transition={{ duration: 10, repeat: Infinity }}
+      />
+      <motion.div
+        className="absolute bottom-[-120px] right-[-120px] w-[320px] h-[320px] bg-[#132440]/20 rounded-full blur-3xl"
+        animate={{ x: [0, -40, 0], y: [0, -30, 0] }}
+        transition={{ duration: 12, repeat: Infinity }}
+      />
 
-      <form onSubmit={onSubmit} className="mx-auto max-w-2xl">
-        <div className="grid grid-cols-auto sm:grid-cols-2 gap-6 mt-10 mb-8">
-          <input
-            className="outline-none bg-white p-3 border border-gray-400 rounded-md"
-            type="text"
-            placeholder="Enter your name"
-            required
-            name="name"
-          />
-          <input
-            className="outline-none bg-white p-3 border border-gray-400 rounded-md"
-            type="email"
-            placeholder="Enter your email"
-            required
-            name="email"
-          />
-        </div>
+      {/* Content */}
+      <motion.div
+        variants={fadeUp}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        className="relative z-10"
+      >
+        <h4 className="text-center text-lg mb-2 font-ovo">Connect With Me</h4>
+        <h2 className="text-center text-4xl font-semibold">Get In Touch</h2>
 
-        <textarea
-          className="w-full p-4 mb-6 outline-none border border-gray-400 bg-white rounded-md"
-          rows="6"
-          placeholder="Enter your message"
-          required
-          name="message"
-        />
+        <p className="mt-5 mb-12 max-w-2xl mx-auto text-center text-gray-600">
+          Have a project, idea, or feedback? Let’s talk.
+        </p>
 
-        <button
-          className="cursor-pointer py-3 px-8 w-max flex items-center justify-between gap-2 bg-[#132440] text-white rounded-full mx-auto hover:bg-[#001F3D]"
-          type="submit"
-        >
-          Submit now
-          <Image src={assets.right_arrow_white} alt="Submit" className="w-4" />
-        </button>
+        {/* Form */}
+        <form onSubmit={onSubmit} className="max-w-2xl mx-auto space-y-8">
+          {/* Floating Input */}
+          {["name", "email"].map((field, i) => (
+            <div key={i} className="relative">
+              <input
+                type={field === "email" ? "email" : "text"}
+                name={field}
+                required
+                className="peer w-full bg-white border border-gray-400 rounded-md px-4 py-3 outline-none focus:border-[#132440]"
+              />
+              <label
+                className="absolute left-4 top-3 text-gray-500 bg-white px-1
+                           transition-all peer-focus:-top-2 peer-focus:text-xs
+                           peer-valid:-top-2 peer-valid:text-xs"
+              >
+                {field === "name" ? "Your Name" : "Your Email"}
+              </label>
+            </div>
+          ))}
 
-        <p className="mt-4">{result}</p>
-      </form>
-    </div>
+          {/* Floating Textarea */}
+          <div className="relative">
+            <textarea
+              name="message"
+              rows="5"
+              required
+              className="peer w-full bg-white border border-gray-400 rounded-md px-4 py-3 outline-none focus:border-[#132440]"
+            />
+            <label
+              className="absolute left-4 top-3 text-gray-500 bg-white px-1
+                         transition-all peer-focus:-top-2 peer-focus:text-xs
+                         peer-valid:-top-2 peer-valid:text-xs"
+            >
+              Your Message
+            </label>
+          </div>
+
+          {/* 🧲 Magnetic Button */}
+          <div className="flex justify-center">
+            <motion.button
+              ref={magnetic.ref}
+              onMouseMove={magnetic.handleMove}
+              onMouseLeave={magnetic.reset}
+              whileTap={{ scale: 0.9 }}
+              className="relative px-8 py-3 bg-[#132440] text-white rounded-full
+                         flex items-center gap-2 shadow-lg"
+            >
+              Submit
+              <Image src={assets.right_arrow_white} alt="" className="w-4" />
+            </motion.button>
+          </div>
+        </form>
+      </motion.div>
+
+      {/* ✨ Toast */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            variants={toastAnim}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className={`fixed bottom-6 right-6 px-6 py-3 rounded-lg text-white shadow-lg
+              ${
+                toast.type === "success"
+                  ? "bg-green-600"
+                  : toast.type === "error"
+                  ? "bg-red-600"
+                  : "bg-blue-600"
+              }`}
+          >
+            {toast.message}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </section>
   );
 }
 
