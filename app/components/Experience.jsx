@@ -25,10 +25,14 @@ export default function Experience() {
     setActiveIndex(activeIndex === index ? null : index);
   };
 
+   
+
   return (
     <section
       id="experience"
-      className="bg-[#F6F5F2] w-full px-[8%] md:px-[12%] py-16"
+  
+
+      className="bg-[#F6F5F2] w-full px-[8%] md:px-[12%] py-16]"
     >
       
 

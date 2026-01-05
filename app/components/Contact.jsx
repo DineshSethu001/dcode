@@ -72,6 +72,12 @@ function Contact() {
   return (
     <section
       id="contact"
+         style={{
+  backgroundImage: "url('/connect.png')",
+  backgroundPosition: "center",
+  backgroundRepeat: "no-repeat",
+  backgroundSize: "cover",
+}}
       className="relative overflow-hidden bg-[#F6F5F2] px-[12%] py-20"
     >
       {/* 🌊 Animated Background Blobs */}
@@ -110,7 +116,10 @@ function Contact() {
                 type={field === "email" ? "email" : "text"}
                 name={field}
                 required
-                className="peer w-full bg-white border border-gray-400 rounded-md px-4 py-3 outline-none focus:border-[#132440]"
+                className="peer w-full bg-white/30 backdrop-blur-md
+           border border-white/40 rounded-md
+           px-4 py-3 text-gray-900
+           outline-none focus:border-[#132440]"
               />
               <label
                 className="absolute left-4 top-3 text-gray-500 bg-white px-1
@@ -128,7 +137,10 @@ function Contact() {
               name="message"
               rows="5"
               required
-              className="peer w-full bg-white border border-gray-400 rounded-md px-4 py-3 outline-none focus:border-[#132440]"
+              className="peer w-full bg-white/30 backdrop-blur-md
+           border border-white/40 rounded-md
+           px-4 py-3 text-gray-900
+           outline-none focus:border-[#132440]"
             />
             <label
               className="absolute left-4 top-3 text-gray-500 bg-white px-1
