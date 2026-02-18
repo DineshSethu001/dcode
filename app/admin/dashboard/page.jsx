@@ -18,10 +18,13 @@ const techIcons = {
   "Styled Components": SiStyledcomponents,
   "TensorFlow.js": SiTensorflow,
 };
+const admin = useAdmin();
+if (!admin) return null;
+
 
 export default function AdminDashboard() {
-  const { isAuthenticated, logout, isLoading } = useAdmin();
-  const router = useRouter();
+const { isAuthenticated, logout, isLoading } = admin;
+ const router = useRouter();
   const [projects, setProjects] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
