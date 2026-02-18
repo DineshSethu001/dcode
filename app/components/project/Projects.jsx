@@ -9,18 +9,35 @@ const Projects = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 3; // Show 3 cards per page
 
-  useEffect(() => {
-    const loadProjects = async () => {
-      const { data, error } = await supabase.from('projects').select('*').order('created_at', { ascending: false });
-      if (error) {
-        console.error('Error loading projects:', error);
-        return;
-      }
-      setProjects(data || []);
-    };
+ useEffect(() => {
+  const loadProjects = async () => {
+    const { data, error } = await supabase
+      .from("projects")
+      .select("*")
+      .order("created_at", { ascending: false });
 
-    loadProjects();
-  }, []);
+    if (error) {
+      console.error("Error loading projects:", error);
+      return;
+    }
+
+    // 🔄 MAP backend fields → UI-friendly shape
+    const formatted = (data || []).map((p) => ({
+      id: p.id,
+      title: p.title,
+      description: p.description,
+      image: p.image_url,        // 👈 important
+      demo: p.live_url,          // 👈 important
+      code: p.github_url,        // 👈 important
+      tech: p.tech_stack || [],  // 👈 important
+    }));
+
+    setProjects(formatted);
+  };
+
+  loadProjects();
+}, []);
+
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;

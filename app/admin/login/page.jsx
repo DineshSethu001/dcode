@@ -20,21 +20,22 @@ export default function AdminLogin() {
     }
   }, [isAuthenticated, router]);
   
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    setIsLoading(true);
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError("");
+  setIsLoading(true);
 
-    const result = await login(email, password);
-    
-    if (result.success) {
-      router.push("/admin/dashboard");
-    } else {
-      setError(result.error || "Invalid credentials");
-    }
-    
-    setIsLoading(false);
-  };
+  const result = await login(email, password);
+
+  if (result.success) {
+    router.push("/admin/dashboard");
+  } else {
+    setError(result.error || "Invalid Supabase credentials");
+  }
+
+  setIsLoading(false);
+};
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F0EBE3] to-[#F6F5F2] flex items-center justify-center px-4 relative">
