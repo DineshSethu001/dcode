@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { supabase } from "@/utils/supabase";
+import { supabase } from "../utils/supabase";
 
 const AdminContext = createContext();
 
@@ -29,7 +29,7 @@ export function AdminProvider({ children }) {
 
   // 🔐 Supabase Login ONLY (Admin restricted)
   const login = async (email, password) => {
-    const ADMIN_EMAIL = "your-email@gmail.com"; // 🔒 replace with yours
+const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
 
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
