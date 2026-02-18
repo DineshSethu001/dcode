@@ -20,20 +20,14 @@ export const metadata: Metadata = {
   description: "It is the website that show case my skills",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+
+
+
+export default function RootLayout({ children }) {
   return (
-    <html
-      lang="en"
-      className="scroll-smooth"
-    >
-      <body className={`${outfit.variable} ${ovo.variable} font-outfit overflow-x-hidden antialiased`}>
-        <AdminProvider>
-          {children}
-        </AdminProvider>
+    <html lang="en">
+      <body>
+        <AdminProvider>{children}</AdminProvider>
       </body>
     </html>
   );

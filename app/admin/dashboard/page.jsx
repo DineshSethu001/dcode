@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAdmin } from "../../context/AdminContext";
+import { supabase } from "../../utils/supabase";
 import { LogOut, Plus, Trash2, Edit2, Save, X } from "lucide-react";
 import { FaReact, FaNodeJs } from "react-icons/fa";
 import { SiTailwindcss, SiStyledcomponents, SiTensorflow } from "react-icons/si";
@@ -30,6 +31,8 @@ export default function AdminDashboard() {
     code: "",
   });
   const [techInput, setTechInput] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -43,22 +46,17 @@ export default function AdminDashboard() {
     }
   }, [isAuthenticated]);
 
-  const loadProjects = () => {
-    const stored = localStorage.getItem("projects");
-    if (stored) {
-      setProjects(JSON.parse(stored));
-    } else {
-      // Load default projects from ProjectAsset
-      import("../../components/project/ProjectAsset").then((module) => {
-        const defaultProjects = module.default;
-        setProjects(defaultProjects);
-        localStorage.setItem("projects", JSON.stringify(defaultProjects));
-      });
+  const loadProjects = async () => {
+    const { data, error } = await supabase.from('projects').select('*').order('created_at', { ascending: false });
+    if (error) {
+      console.error('Error loading projects:', error);
+      return;
     }
+    setProjects(data || []);
   };
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     router.push("/admin/login");
   };
 
@@ -83,37 +81,78 @@ export default function AdminDashboard() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const newProject = {
-      ...formData,
-      id: editingProject ? editingProject.id : Date.now(),
-    };
+    setSubmitting(true);
+    setError("");
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) {
+        setError("Not authenticated — please log in.");
+        return;
+      }
 
-    let updatedProjects;
-    if (editingProject) {
-      updatedProjects = projects.map((p) =>
-        p.id === editingProject.id ? newProject : p
-      );
-    } else {
-      updatedProjects = [...projects, newProject];
+      let imageUrl = formData.image;
+
+      if (formData.file) {
+        const fileExt = formData.file.name.split('.').pop();
+        const fileName = `${Date.now()}.${fileExt}`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('project-images')
+          .upload(fileName, formData.file, { cacheControl: '3600', upsert: false });
+        if (uploadError) {
+          console.error('Error uploading image:', uploadError);
+          setError(uploadError.message || 'Image upload failed');
+          return;
+        }
+        const { data: urlData } = supabase.storage.from('project-images').getPublicUrl(fileName);
+        imageUrl = urlData?.publicUrl ?? '';
+      }
+
+   const projectData = {
+  title: formData.title,
+  description: formData.description,
+  tech_stack: formData.tech,
+  image_url: imageUrl,
+  live_url: formData.demo,       // 👈 demo → live_url
+  github_url: formData.code,     // 👈 code → github_url
+};
+
+      if (formData.code) {
+        projectData.code = formData.code;
+      }
+
+      if (editingProject) {
+        const { data, error } = await supabase.from('projects').update(projectData).eq('id', editingProject.id).select();
+        if (error) {
+          console.error('Error updating project:', error);
+          setError(error.message || 'Failed to update project');
+          return;
+        }
+      } else {
+        const { data, error } = await supabase.from('projects').insert(projectData).select();
+        if (error) {
+          console.error('Error adding project:', error);
+          setError(error.message || 'Failed to add project');
+          return;
+        }
+      }
+
+      await loadProjects();
+      resetForm();
+    } finally {
+      setSubmitting(false);
     }
-
-    setProjects(updatedProjects);
-    localStorage.setItem("projects", JSON.stringify(updatedProjects));
-    
-    // Update the Projects component
-    window.dispatchEvent(new Event("projectsUpdated"));
-    
-    resetForm();
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (confirm("Are you sure you want to delete this project?")) {
-      const updatedProjects = projects.filter((p) => p.id !== id);
-      setProjects(updatedProjects);
-      localStorage.setItem("projects", JSON.stringify(updatedProjects));
-      window.dispatchEvent(new Event("projectsUpdated"));
+      const { error } = await supabase.from('projects').delete().eq('id', id);
+      if (error) {
+        console.error('Error deleting project:', error);
+        return;
+      }
+      await loadProjects();
     }
   };
 
@@ -332,13 +371,20 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
+              {error && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                  {error}
+                </div>
+              )}
+
               <div className="flex gap-4">
                 <button
                   type="submit"
-                  className="flex items-center gap-2 bg-[#6A9457] text-white px-6 py-2 rounded-lg hover:bg-[#5b8b49] transition-colors"
+                  disabled={submitting}
+                  className="flex items-center gap-2 bg-[#6A9457] text-white px-6 py-2 rounded-lg hover:bg-[#5b8b49] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Save className="w-4 h-4" />
-                  {editingProject ? "Update Project" : "Add Project"}
+                  {submitting ? (editingProject ? "Updating..." : "Saving...") : (editingProject ? "Update Project" : "Add Project")}
                 </button>
                 <button
                   type="button"

@@ -7,7 +7,7 @@ import { Lock, User, ArrowLeft, Home } from "lucide-react";
 import Link from "next/link";
 
 export default function AdminLogin() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -19,13 +19,13 @@ export default function AdminLogin() {
       router.push("/admin/dashboard");
     }
   }, [isAuthenticated, router]);
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
 
-    const result = login(username, password);
+    const result = await login(email, password);
     
     if (result.success) {
       router.push("/admin/dashboard");
@@ -60,16 +60,16 @@ export default function AdminLogin() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Username
+              Email
             </label>
             <div className="relative">
               <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6A9457] focus:border-transparent outline-none"
-                placeholder="Enter username"
+                placeholder="Enter email"
                 required
               />
             </div>
@@ -108,7 +108,7 @@ export default function AdminLogin() {
         </form>
 
         <div className="mt-6 text-center text-sm text-gray-500">
-          <p>Default: admin / admin123</p>
+          <p>Enter your admin credentials</p>
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import ProjectCard from "./ProjectCard.jsx";
-import projectAsset from "./ProjectAsset.js";
+import { supabase } from "../../utils/supabase";
 import { FcIdea } from "react-icons/fc";
 
 const Projects = () => {
@@ -10,30 +10,16 @@ const Projects = () => {
   const itemsPerPage = 3; // Show 3 cards per page
 
   useEffect(() => {
-    // Load projects from localStorage or use default
-    const loadProjects = () => {
-      const stored = localStorage.getItem("projects");
-      if (stored) {
-        try {
-          const parsedProjects = JSON.parse(stored);
-          setProjects(parsedProjects);
-        } catch (e) {
-          setProjects(projectAsset);
-        }
-      } else {
-        setProjects(projectAsset);
+    const loadProjects = async () => {
+      const { data, error } = await supabase.from('projects').select('*').order('created_at', { ascending: false });
+      if (error) {
+        console.error('Error loading projects:', error);
+        return;
       }
+      setProjects(data || []);
     };
 
     loadProjects();
-
-    // Listen for updates from admin dashboard
-    const handleUpdate = () => {
-      loadProjects();
-    };
-
-    window.addEventListener("projectsUpdated", handleUpdate);
-    return () => window.removeEventListener("projectsUpdated", handleUpdate);
   }, []);
 
   const indexOfLastItem = currentPage * itemsPerPage;

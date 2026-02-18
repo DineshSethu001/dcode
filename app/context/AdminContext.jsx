@@ -1,54 +1,59 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { supabase } from "../utils/supabase";
 
 const AdminContext = createContext();
 
-export const useAdmin = () => {
-  const context = useContext(AdminContext);
-  if (!context) {
-    throw new Error("useAdmin must be used within AdminProvider");
-  }
-  return context;
-};
-
-export const AdminProvider = ({ children }) => {
+export function AdminProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Check if admin is logged in on mount
+  // Check existing session
   useEffect(() => {
-    const authStatus = localStorage.getItem("adminAuth");
-    if (authStatus === "true") {
-      setIsAuthenticated(true);
-    }
-    setIsLoading(false);
+    supabase.auth.getSession().then(({ data }) => {
+      setIsAuthenticated(!!data.session);
+      setIsLoading(false);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setIsAuthenticated(!!session);
+      }
+    );
+
+    return () => {
+      subscription?.unsubscribe();
+    };
   }, []);
 
-  const login = (username, password) => {
-    // Simple authentication - in production, use secure API
-    const ADMIN_USERNAME = process.env.NEXT_PUBLIC_ADMIN_USERNAME || "admin";
-    const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "admin123";
+  // 🔐 LOGIN
+  const login = async (email, password) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-      localStorage.setItem("adminAuth", "true");
-      setIsAuthenticated(true);
-      return { success: true };
+    if (error) {
+      return { success: false, error: error.message };
     }
-    return { success: false, error: "Invalid credentials" };
+
+    return { success: true };
   };
 
-  const logout = () => {
-    localStorage.removeItem("adminAuth");
+  // 🚪 LOGOUT
+  const logout = async () => {
+    await supabase.auth.signOut();
     setIsAuthenticated(false);
   };
 
   return (
-    <AdminContext.Provider value={{ isAuthenticated, login, logout, isLoading }}>
+    <AdminContext.Provider
+      value={{ login, logout, isAuthenticated, isLoading }}
+    >
       {children}
     </AdminContext.Provider>
   );
-};
+}
 
-
-
+export const useAdmin = () => useContext(AdminContext);
