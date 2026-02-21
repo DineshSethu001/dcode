@@ -36,8 +36,14 @@ const TECH_SUGGESTIONS = [
     "Material UI (MUI)",
     "ScrollReveal",
 ];
-
+const normalizeTechStack = (tech) => {
+    if (Array.isArray(tech)) return tech;
+    if (typeof tech === "string")
+        return tech.split(",").map((t) => t.trim()).filter(Boolean);
+    return [];
+};
 export default function AdminDashboard() {
+    
     const router = useRouter();
     const { logout } = useAdmin(); // ✅ single source of truth
 
@@ -95,32 +101,31 @@ export default function AdminDashboard() {
 
     /* ---------------- FILTER ---------------- */
     const techOptions = [
-        "all",
-        ...new Set(
-            projects
-                .flatMap((p) => p.tech_stack?.split(",").map((t) => t.trim()))
-                .filter(Boolean)
-        ),
-    ];
+    "all",
+    ...new Set(
+        projects.flatMap((p) => normalizeTechStack(p.tech_stack))
+    ),
+];
+   const filteredProjects = projects.filter((p) => {
+    const q = search.toLowerCase();
+    const techArray = normalizeTechStack(p.tech_stack);
 
-    const filteredProjects = projects.filter((p) => {
-        const q = search.toLowerCase();
-        return (
-            (p.title?.toLowerCase().includes(q) ||
-                p.description?.toLowerCase().includes(q) ||
-                p.tech_stack?.toLowerCase().includes(q)) &&
-            (techFilter === "all" || p.tech_stack?.includes(techFilter))
-        );
-    });
-
+    return (
+        (p.title?.toLowerCase().includes(q) ||
+            p.description?.toLowerCase().includes(q) ||
+            techArray.join(", ").toLowerCase().includes(q)) &&
+        (techFilter === "all" || techArray.includes(techFilter))
+    );
+});
     /* ---------------- CHART DATA ---------------- */
-    const chartData = techOptions
-        .filter((t) => t !== "all")
-        .map((t) => ({
-            name: t,
-            count: projects.filter((p) => p.tech_stack?.includes(t)).length,
-        }));
-
+   const chartData = techOptions
+    .filter((t) => t !== "all")
+    .map((t) => ({
+        name: t,
+        count: projects.filter((p) =>
+            normalizeTechStack(p.tech_stack).includes(t)
+        ).length,
+    }));
     /* ---------------- IMAGE UPLOAD ---------------- */
     const uploadImage = async (file) => {
         if (!file) return;
@@ -212,7 +217,7 @@ export default function AdminDashboard() {
             github_url: p.github_url,
             live_url: p.live_url,
         });
-        setTechList(p.tech_stack?.split(",").map((t) => t.trim()) || []);
+setTechList(normalizeTechStack(p.tech_stack));
         setImagePreview(p.image_url);
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
