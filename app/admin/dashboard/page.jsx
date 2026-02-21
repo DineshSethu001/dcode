@@ -1,462 +1,461 @@
 "use client";
 
-
-import { useAdmin } from "../../context/AdminContext";
-
-
-import { useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
+import { supabase } from "@/app/utils/supabase";
+import { useAdmin } from "@/app/context/AdminContext";
 import { useRouter } from "next/navigation";
-import { supabase } from "../../utils/supabase";
-import { LogOut, Plus, Trash2, Edit2, Save, X } from "lucide-react";
-import { FaReact, FaNodeJs } from "react-icons/fa";
-import { SiTailwindcss, SiStyledcomponents, SiTensorflow } from "react-icons/si";
+import {
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    Tooltip,
+    ResponsiveContainer,
+} from "recharts";
 
-const techIcons = {
-  React: FaReact,
-  "Node.js": FaNodeJs,
-  "Tailwind CSS": SiTailwindcss,
-  "Styled Components": SiStyledcomponents,
-  "TensorFlow.js": SiTensorflow,
-};
-const admin = useAdmin();
-if (!admin) return null;
+/* -------- TECH SUGGESTIONS -------- */
+const TECH_SUGGESTIONS = [
+    "React",
+    "Next.js",
+    "Tailwind CSS",
+    "Supabase",
+    "Node.js",
+    "Express",
+    "MongoDB",
+    "PostgreSQL",
+    "TypeScript",
+    "JavaScript",
+    "Firebase",
+    "Redux",
+    "Prisma",
+    "Vercel",
+    "React JS (Vite)",
 
+    "React Router DOM",
+    "Lucide React Icons",
+    "Material UI (MUI)",
+    "ScrollReveal",
+];
 
 export default function AdminDashboard() {
-const { isAuthenticated, logout, isLoading } = admin;
- const router = useRouter();
-  const [projects, setProjects] = useState([]);
-  const [showForm, setShowForm] = useState(false);
-  const [editingProject, setEditingProject] = useState(null);
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    tech: [],
-    image: "",
-    demo: "",
-    code: "",
-  });
-  const [techInput, setTechInput] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
+    const router = useRouter();
+    const { logout } = useAdmin(); // ✅ single source of truth
 
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push("/admin/login");
-    }
-  }, [isAuthenticated, isLoading, router]);
+    /* ---------------- THEME ---------------- */
+    const [dark, setDark] = useState(false);
+    const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      loadProjects();
-    }
-  }, [isAuthenticated]);
+    /* ---------------- DATA ---------------- */
+    const [projects, setProjects] = useState([]);
 
-  const loadProjects = async () => {
-    const { data, error } = await supabase.from('projects').select('*').order('created_at', { ascending: false });
-    if (error) {
-      console.error('Error loading projects:', error);
-      return;
-    }
-    setProjects(data || []);
-  };
+    /* ---------------- SEARCH + FILTER ---------------- */
+    const [search, setSearch] = useState("");
+    const [techFilter, setTechFilter] = useState("all");
 
-  const handleLogout = async () => {
-    await logout();
-    router.push("/admin/login");
-  };
+    /* ---------------- TECH INPUT ---------------- */
+    const [techInput, setTechInput] = useState("");
+    const [techList, setTechList] = useState([]);
 
-  const handleAddTech = () => {
-    if (techInput.trim()) {
-      const techParts = techInput.split(":");
-      const name = techParts[0].trim();
-      const color = techParts[1]?.trim() || "text-blue-500";
-
-      setFormData({
-        ...formData,
-        tech: [...formData.tech, { name, color }],
-      });
-      setTechInput("");
-    }
-  };
-
-  const handleRemoveTech = (index) => {
-    setFormData({
-      ...formData,
-      tech: formData.tech.filter((_, i) => i !== index),
+    /* ---------------- FORM ---------------- */
+    const [form, setForm] = useState({
+        title: "",
+        description: "",
+        image_url: "",
+        github_url: "",
+        live_url: "",
     });
-  };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSubmitting(true);
-    setError("");
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) {
-        setError("Not authenticated — please log in.");
-        return;
-      }
+    const [editingId, setEditingId] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
+    const [uploading, setUploading] = useState(false);
+    const fileInputRef = useRef(null);
 
-      let imageUrl = formData.image;
+    /* ---------------- AUTO DARK MODE ---------------- */
+    useEffect(() => {
+        const media = window.matchMedia("(prefers-color-scheme: dark)");
+        setDark(media.matches);
+        setMounted(true);
+        const handler = (e) => setDark(e.matches);
+        media.addEventListener("change", handler);
+        return () => media.removeEventListener("change", handler);
+    }, []);
 
-      if (formData.file) {
-        const fileExt = formData.file.name.split('.').pop();
-        const fileName = `${Date.now()}.${fileExt}`;
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('project-images')
-          .upload(fileName, formData.file, { cacheControl: '3600', upsert: false });
-        if (uploadError) {
-          console.error('Error uploading image:', uploadError);
-          setError(uploadError.message || 'Image upload failed');
-          return;
-        }
-        const { data: urlData } = supabase.storage.from('project-images').getPublicUrl(fileName);
-        imageUrl = urlData?.publicUrl ?? '';
-      }
+    /* ---------------- FETCH ---------------- */
+    const fetchProjects = async () => {
+        const { data } = await supabase
+            .from("projects")
+            .select("*")
+            .order("created_at", { ascending: false });
+        setProjects(data || []);
+    };
 
-   const projectData = {
-  title: formData.title,
-  description: formData.description,
-  tech_stack: formData.tech,
-  image_url: imageUrl,
-  live_url: formData.demo,       // 👈 demo → live_url
-  github_url: formData.code,     // 👈 code → github_url
-};
+    useEffect(() => {
+        fetchProjects();
+    }, []);
 
-      if (formData.code) {
-        projectData.code = formData.code;
-      }
+    /* ---------------- FILTER ---------------- */
+    const techOptions = [
+        "all",
+        ...new Set(
+            projects
+                .flatMap((p) => p.tech_stack?.split(",").map((t) => t.trim()))
+                .filter(Boolean)
+        ),
+    ];
 
-      if (editingProject) {
-        const { data, error } = await supabase.from('projects').update(projectData).eq('id', editingProject.id).select();
-        if (error) {
-          console.error('Error updating project:', error);
-          setError(error.message || 'Failed to update project');
-          return;
-        }
-      } else {
-        const { data, error } = await supabase.from('projects').insert(projectData).select();
-        if (error) {
-          console.error('Error adding project:', error);
-          setError(error.message || 'Failed to add project');
-          return;
-        }
-      }
-
-      await loadProjects();
-      resetForm();
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleDelete = async (id) => {
-    if (confirm("Are you sure you want to delete this project?")) {
-      const { error } = await supabase.from('projects').delete().eq('id', id);
-      if (error) {
-        console.error('Error deleting project:', error);
-        return;
-      }
-      await loadProjects();
-    }
-  };
-
-  const handleEdit = (project) => {
-    setEditingProject(project);
-    // Handle image - could be imported object or string URL
-    let imageUrl = "";
-    if (typeof project.image === 'string') {
-      imageUrl = project.image;
-    } else if (project.image?.src) {
-      imageUrl = project.image.src;
-    } else if (project.image) {
-      imageUrl = project.image;
-    }
-    
-    setFormData({
-      title: project.title,
-      description: project.description,
-      tech: project.tech || [],
-      image: imageUrl,
-      demo: project.demo || "",
-      code: project.code || "",
+    const filteredProjects = projects.filter((p) => {
+        const q = search.toLowerCase();
+        return (
+            (p.title?.toLowerCase().includes(q) ||
+                p.description?.toLowerCase().includes(q) ||
+                p.tech_stack?.toLowerCase().includes(q)) &&
+            (techFilter === "all" || p.tech_stack?.includes(techFilter))
+        );
     });
-    setShowForm(true);
-  };
 
-  const resetForm = () => {
-    setFormData({
-      title: "",
-      description: "",
-      tech: [],
-      image: "",
-      demo: "",
-      code: "",
-    });
-    setTechInput("");
-    setShowForm(false);
-    setEditingProject(null);
-  };
+    /* ---------------- CHART DATA ---------------- */
+    const chartData = techOptions
+        .filter((t) => t !== "all")
+        .map((t) => ({
+            name: t,
+            count: projects.filter((p) => p.tech_stack?.includes(t)).length,
+        }));
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Loading...</div>
-      </div>
+    /* ---------------- IMAGE UPLOAD ---------------- */
+    const uploadImage = async (file) => {
+        if (!file) return;
+        setUploading(true);
+
+        const fileName = `${Date.now()}-${file.name}`;
+        const { error } = await supabase.storage
+            .from("project-images")
+            .upload(fileName, file);
+
+        if (!error) {
+            const { data } = supabase.storage
+                .from("project-images")
+                .getPublicUrl(fileName);
+
+            setForm((prev) => ({ ...prev, image_url: data.publicUrl }));
+            setImagePreview(data.publicUrl);
+        }
+        setUploading(false);
+    };
+
+    /* ---------------- TECH HANDLERS ---------------- */
+    const addTech = (tech) => {
+        if (!techList.includes(tech)) setTechList([...techList, tech]);
+        setTechInput("");
+    };
+
+    const removeTech = (tech) => {
+        setTechList(techList.filter((t) => t !== tech));
+    };
+
+    const filteredSuggestions = TECH_SUGGESTIONS.filter(
+        (t) =>
+            t.toLowerCase().includes(techInput.toLowerCase()) &&
+            !techList.includes(t)
     );
-  }
 
-  if (!isAuthenticated) {
-    return null;
-  }
+    /* ---------------- FORM ---------------- */
+    const handleChange = (e) =>
+        setForm({ ...form, [e.target.name]: e.target.value });
 
-  return (
-    <div className="min-h-screen bg-[#F0EBE3] py-8 px-4">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-8 flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
-            <p className="text-gray-600 mt-1">Manage your projects</p>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
-          >
-            <LogOut className="w-4 h-4" />
-            Logout
-          </button>
-        </div>
+    const resetForm = () => {
+        setForm({
+            title: "",
+            description: "",
+            image_url: "",
+            github_url: "",
+            live_url: "",
+        });
+        setTechList([]);
+        setEditingId(null);
+        setImagePreview(null);
+    };
 
-        {/* Add Project Button */}
-        <div className="mb-6">
-          <button
-            onClick={() => setShowForm(!showForm)}
-            className="flex items-center gap-2 bg-[#6A9457] text-white px-6 py-3 rounded-lg hover:bg-[#5b8b49] transition-colors shadow-md"
-          >
-            <Plus className="w-5 h-5" />
-            {showForm ? "Cancel" : "Add New Project"}
-          </button>
-        </div>
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
-        {/* Add/Edit Form */}
-        {showForm && (
-          <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
-            <h2 className="text-2xl font-bold mb-6">
-              {editingProject ? "Edit Project" : "Add New Project"}
-            </h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Title *
-                </label>
-                <input
-                  type="text"
-                  value={formData.title}
-                  onChange={(e) =>
-                    setFormData({ ...formData, title: e.target.value })
-                  }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6A9457] outline-none"
-                  required
-                />
-              </div>
+        const payload = {
+            ...form,
+            tech_stack: techList.join(", "),
+        };
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Description *
-                </label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
-                  rows="4"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6A9457] outline-none"
-                  required
-                />
-              </div>
+        let error;
 
-              <div>
-  <label className="block text-sm font-medium text-gray-700 mb-2">
-    Upload Image *
-  </label>
-  <input
-    type="file"
-    accept="image/*"
-    onChange={(e) => {
-      const file = e.target.files[0];
-      if (file) {
-        // Create a local URL for preview or store the file object
-        setFormData({ ...formData, image: URL.createObjectURL(file), file });
-      }
-    }}
-    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6A9457] outline-none"
-    required
-  />
-  {formData.image && (
-    <img
-      src={formData.image}
-      alt="Preview"
-      className="mt-2 w-32 h-32 object-cover rounded-md"
-    />
-  )}
-</div>
+        if (editingId) {
+            ({ error } = await supabase
+                .from("projects")
+                .update(payload)
+                .eq("id", editingId));
+        } else {
+            ({ error } = await supabase.from("projects").insert([payload]));
+        }
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Tech Stack
-                </label>
-                <div className="flex gap-2 mb-2">
-                  <input
-                    type="text"
-                    value={techInput}
-                    onChange={(e) => setTechInput(e.target.value)}
-                    onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), handleAddTech())}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6A9457] outline-none"
-                    placeholder="e.g., React:text-blue-500"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleAddTech}
-                    className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
-                  >
-                    Add
-                  </button>
-                </div>
-                    <div className="flex flex-wrap gap-2">
-                      {formData.tech.map((tech, index) => {
-                        const Icon = techIcons[tech.name] || FaReact;
-                        return (
-                          <span
-                            key={index}
-                            className="flex items-center gap-1 bg-gray-100 px-3 py-1 rounded-full text-sm"
-                          >
-                            <Icon className={`${tech.color} text-sm`} />
-                            {tech.name}
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveTech(index)}
-                              className="ml-1 text-red-500 hover:text-red-700"
-                            >
-                              <X className="w-3 h-3" />
+        if (error) {
+            alert(error.message);
+            return;
+        }
+
+        resetForm();
+        fetchProjects();
+    };
+
+    const handleEdit = (p) => {
+        setEditingId(p.id);
+        setForm({
+            title: p.title,
+            description: p.description,
+            image_url: p.image_url,
+            github_url: p.github_url,
+            live_url: p.live_url,
+        });
+        setTechList(p.tech_stack?.split(",").map((t) => t.trim()) || []);
+        setImagePreview(p.image_url);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    const handleDelete = async (project) => {
+        if (!confirm("Delete project permanently?")) return;
+
+        if (project.image_url) {
+            const fileName = project.image_url.split("/").pop();
+            await supabase.storage.from("project-images").remove([fileName]);
+        }
+
+        await supabase.from("projects").delete().eq("id", project.id);
+        fetchProjects();
+    };
+
+    return (
+        <div
+            className="min-h-screen bg-cover bg-center"
+            style={{
+                backgroundImage: dark
+                    ? "url('/dark-theme.jpg')"
+                    : "url('/nature-theme.jpg')",
+            }}
+        >
+            <div className="min-h-screen bg-black/40 backdrop-blur-md px-6 py-14">
+                <div
+                    className={`max-w-6xl mx-auto text-white space-y-16 transition-all duration-700 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+                        }`}
+                >
+                    {/* HEADER */}
+                    <div className="flex justify-between items-center">
+                        <h1 className="text-4xl font-semibold">Admin Dashboard</h1>
+                        <button
+                            onClick={async () => {
+                                await logout();               // clears Supabase session
+                                router.replace("/admin/login"); // redirect safely
+                            }}
+                            className="cursor-pointer bg-red-600 px-6 py-3 rounded-xl"
+                        >
+                            Logout
+                        </button>
+                    </div>
+
+                    {/* ANALYTICS */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <GlassCard title="Total Projects" value={projects.length} />
+                        <GlassCard title="Tech Stacks" value={techOptions.length - 1} />
+                        <GlassCard title="Visible Results" value={filteredProjects.length} />
+                    </div>
+
+                    {/* CHART */}
+                    <div className="glass">
+                        <h3 className="text-lg font-semibold mb-6">Projects by Tech</h3>
+                        <ResponsiveContainer width="100%" height={260}>
+                            <BarChart data={chartData}>
+                                <XAxis dataKey="name" stroke="#fff" />
+                                <YAxis stroke="#fff" />
+                                <Tooltip />
+                                <Bar dataKey="count" fill="#34d399" radius={[6, 6, 0, 0]} />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+
+                    {/* FORM */}
+                    <form
+                        onSubmit={handleSubmit}
+                        className="glass grid grid-cols-1 md:grid-cols-2 gap-6"
+                    >
+                        <input
+                            name="title"
+                            placeholder="Project Title"
+                            value={form.title}
+                            onChange={handleChange}
+                            className="input"
+                        />
+
+                        <input
+                            name="github_url"
+                            placeholder="GitHub Source URL"
+                            value={form.github_url}
+                            onChange={handleChange}
+                            className="input"
+                        />
+
+                        <input
+                            name="live_url"
+                            placeholder="Live Website URL"
+                            value={form.live_url}
+                            onChange={handleChange}
+                            className="input"
+                        />
+
+                        {/* TECH STACK */}
+                        <div className="col-span-full relative">
+                            <input
+                                value={techInput}
+                                onChange={(e) => setTechInput(e.target.value)}
+                                placeholder="Add tech (React, Node…)"
+                                className="input"
+                            />
+
+                            {techInput && filteredSuggestions.length > 0 && (
+                                <div className="absolute z-10 mt-2 w-full bg-black/80 rounded-xl border border-white/20">
+                                    {filteredSuggestions.map((t) => (
+                                        <div
+                                            key={t}
+                                            onClick={() => addTech(t)}
+                                            className="px-4 py-2 hover:bg-white/10 cursor-pointer"
+                                        >
+                                            {t}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            <div className="flex flex-wrap gap-2 mt-3">
+                                {techList.map((t) => (
+                                    <span
+                                        key={t}
+                                        onClick={() => removeTech(t)}
+                                        className="px-4 py-1 bg-emerald-600 rounded-full text-sm cursor-pointer"
+                                    >
+                                        {t} ✕
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* IMAGE UPLOAD */}
+                        <div
+                            onClick={() => fileInputRef.current.click()}
+                            onDrop={(e) => {
+                                e.preventDefault();
+                                uploadImage(e.dataTransfer.files[0]);
+                            }}
+                            onDragOver={(e) => e.preventDefault()}
+                            className="col-span-full border-2 border-dashed border-white/30 rounded-2xl p-8 text-center cursor-pointer"
+                        >
+                            {uploading ? "Uploading…" : "Drag & drop or click to upload image"}
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                hidden
+                                onChange={(e) => uploadImage(e.target.files[0])}
+                            />
+                        </div>
+
+                        {imagePreview && (
+                            <img
+                                src={imagePreview}
+                                className="col-span-full h-48 rounded-2xl object-cover"
+                            />
+                        )}
+
+                        <textarea
+                            name="description"
+                            placeholder="Project description"
+                            value={form.description}
+                            onChange={handleChange}
+                            rows={4}
+                            className="input col-span-full"
+                        />
+
+                        <div className="col-span-full flex gap-4">
+                            <button className="cursor-pointer bg-emerald-600 px-8 py-3 rounded-xl">
+                                {editingId ? "Update Project" : "Create Project"}
                             </button>
-                          </span>
-                        );
-                      })}
+                            {editingId && (
+                                <button
+                                    type="button"
+                                    onClick={resetForm}
+                                    className="bg-gray-500 px-8 py-3 rounded-xl"
+                                >
+                                    Cancel
+                                </button>
+                            )}
+                        </div>
+                    </form>
+
+                    {/* LIST */}
+                    <div className="grid gap-6">
+                        {filteredProjects.map((p) => (
+                            <div key={p.id} className="glass">
+                                <div className="flex justify-between items-center">
+                                    <div>
+                                        <h3 className="text-lg font-semibold">{p.title}</h3>
+                                        <p className="text-sm opacity-80">{p.tech_stack}</p>
+                                    </div>
+                                    <div className="flex gap-3">
+                                        <button
+                                            onClick={() => handleEdit(p)}
+                                            className="cursor-pointer bg-emerald-600 px-5 py-2 rounded-xl"
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(p)}
+                                            className="bg-red-600 px-5 py-2 rounded-xl"
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
                     </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Demo URL
-                  </label>
-                  <input
-                    type="url"
-                    value={formData.demo}
-                    onChange={(e) =>
-                      setFormData({ ...formData, demo: e.target.value })
-                    }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6A9457] outline-none"
-                  />
                 </div>
+            </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Code URL
-                  </label>
-                  <input
-                    type="url"
-                    value={formData.code}
-                    onChange={(e) =>
-                      setFormData({ ...formData, code: e.target.value })
-                    }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6A9457] outline-none"
-                  />
-                </div>
-              </div>
+            {/* GLOBAL STYLES */}
+            <style jsx global>{`
+        .glass {
+          background: linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.18),
+            rgba(255, 255, 255, 0.08)
+          );
+          backdrop-filter: blur(18px);
+          border: 1.5px solid rgba(255, 255, 255, 0.32);
+          border-radius: 1.75rem;
+          padding: 2.25rem;
+        }
 
-              {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-                  {error}
-                </div>
-              )}
-
-              <div className="flex gap-4">
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="flex items-center gap-2 bg-[#6A9457] text-white px-6 py-2 rounded-lg hover:bg-[#5b8b49] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <Save className="w-4 h-4" />
-                  {submitting ? (editingProject ? "Updating..." : "Saving...") : (editingProject ? "Update Project" : "Add Project")}
-                </button>
-                <button
-                  type="button"
-                  onClick={resetForm}
-                  className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        )}
-
-        {/* Projects List */}
-        <div className="bg-white rounded-2xl shadow-lg p-6">
-          <h2 className="text-2xl font-bold mb-6">Projects ({projects.length})</h2>
-          <div className="space-y-4">
-            {projects.map((project, index) => (
-              <div
-                key={project.id || index}
-                className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
-              >
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                      {project.title}
-                    </h3>
-                    <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                      {project.description}
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {project.tech?.map((tech, i) => {
-                        const Icon = techIcons[tech.name] || FaReact;
-                        return (
-                          <span
-                            key={i}
-                            className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-xs"
-                          >
-                            <Icon className={`${tech.color || 'text-blue-500'} text-sm`} />
-                            {tech.name}
-                          </span>
-                        );
-                      })}
-                    </div>
-                  </div>
-                  <div className="flex gap-2 ml-4">
-                    <button
-                      onClick={() => handleEdit(project)}
-                      className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                    >
-                      <Edit2 className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(project.id || index)}
-                      className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+        .input {
+          width: 100%;
+          padding: 1.35rem 1.6rem;
+          border-radius: 1.2rem;
+          background: rgba(255, 255, 255, 0.18);
+          border: 1.5px solid rgba(255, 255, 255, 0.38);
+          color: white;
+          outline: none;
+        }
+      `}</style>
         </div>
-      </div>
-    </div>
-  );
+    );
 }
 
+function GlassCard({ title, value }) {
+    return (
+        <div className="glass text-center">
+            <p className="text-sm opacity-80">{title}</p>
+            <p className="text-3xl font-semibold mt-1">{value}</p>
+        </div>
+    );
+}
