@@ -17,23 +17,31 @@ const About = () => {
       <div className="flex flex-col items-center lg:flex-row my-5 gap-20">
         <div className="w-64 sm:w-80 max-w-none">
           <motion.div
-  initial={{ scale: 0, opacity: 0 }}
-  whileInView={{ scale: 1, opacity: 1 }}
-  transition={{
-    duration: 4,
-    ease: "easeOut"
-  }}
->
-
-          <Image src={assets.author} alt="Author" className="w-full rounded-4xl" />
+            initial={{ scale: 0, opacity: 0 }}
+            whileInView={{ scale: 1, opacity: 1 }}
+            transition={{
+              duration: 4,
+              ease: "easeOut",
+            }}
+          >
+            <Image
+              src={assets.author}
+              alt="Author"
+              className="w-full rounded-4xl"
+            />
           </motion.div>
         </div>
 
         <div className="flex-1">
-          <p className="mb-10 max-w-2xl font-ovo">
+          <p className="mb-6 max-w-2xl font-ovo">
             I am an experienced Frontend Developer. Throughout my career, I have
             had the privilege of collaborating with prestigious organizations,
             contributing to their success and growth.
+          </p>
+
+          {/* ✅ SERVICE LINE ADDED */}
+          <p className="mb-10 max-w-2xl font-semibold text-indigo-700 bg-indigo-100 inline-block px-4 py-2 rounded-lg">
+            I will build your SaaS frontend with React + Tailwind
           </p>
 
           <ul className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl">
@@ -49,7 +57,9 @@ const About = () => {
             ))}
           </ul>
 
-          <h4 className="my-6 text-gray-700 font-ovo">Tools I&apos;m using</h4>
+          <h4 className="my-6 text-gray-700 font-ovo">
+            Tools I&apos;m using
+          </h4>
 
           <ul className="flex items-center gap-3 sm:gap-5">
             {toolsData.map((tool, index) => (

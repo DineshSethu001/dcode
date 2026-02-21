@@ -87,13 +87,13 @@ const Header = () => {
           Contact Me
           <Image src={assets.right_arrow_white} alt="Contact" className="w-4" />
         </a>
-        <a
-          href="/sample-resume.pdf"
-          className="px-10 py-3 border border-gray-500 rounded-full flex gap-2 items-center"
-        >
-          My Resume
-          <Image src={assets.download_icon} alt="Download resume" className="w-4" />
-        </a>
+          <a
+            href="/Dinesh_T.pdf"
+            className="px-10 py-3 border border-gray-500 rounded-full flex gap-2 items-center"
+          >
+            My Resume
+            <Image src={assets.download_icon} alt="Download resume" className="w-4" />
+          </a>
       </div>
     </div>
   );
