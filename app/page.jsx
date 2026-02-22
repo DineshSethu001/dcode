@@ -1,18 +1,16 @@
-"use client";
-import {Header, Navbar, About, Services, Projects, Contact, Footer} from './components'
-import SearchComponent from "./SearchComponent";
+import NavbarWrapper from "./components/NavbarWrapper";
+import { Header, About, Services, Projects, Contact, Footer } from "./components";
 
 export default function Home() {
   return (
     <>
-    <Navbar/>
-    <Header/>
-    <About/>
-    <Services/>
-    <Projects/>
-    <Contact/>
-    <Footer/>
-
+      <NavbarWrapper />
+      <Header />
+      <About />
+      <Services />
+      <Projects />
+      <Contact />
+      <Footer />
     </>
   );
 }
