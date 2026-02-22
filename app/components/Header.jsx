@@ -3,7 +3,6 @@
 import React from "react";
 import assets from "../assets /assets";
 import Image from "next/image";
-+ import { motion } from "framer-motion";
 const Header = () => {
   return (
     <div className="bg-[#F6F5F2] text-center mx-auto x-w-3xl h-screen flex flex-col justify-center gap-4 items-center ">
