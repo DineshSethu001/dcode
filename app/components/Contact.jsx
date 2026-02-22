@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { assets } from "../assets/index";
+import { assets } from "../assets";
 /* ---------------- Animations ---------------- */
 
 const fadeUp = {

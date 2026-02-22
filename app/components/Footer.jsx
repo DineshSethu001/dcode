@@ -2,7 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import { assets } from "../assets/index";
+import { assets } from "../assets";
 import { Github, Linkedin, Mail, Phone } from "lucide-react";
 
 function Footer() {

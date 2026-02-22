@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image.js";
-import { assets } from "../assets/index";
+import { assets } from "../assets";
 import { motion } from "motion/react";
 
 const About = () => {
