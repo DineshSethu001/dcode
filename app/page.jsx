@@ -14,7 +14,7 @@ export default function Home() {
 
       <Header />
       <About />
-      <Services />
+      <Experience />
       <Projects />
       <Contact />
       <Footer />
