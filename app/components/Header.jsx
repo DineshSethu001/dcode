@@ -1,8 +1,10 @@
 "use client";
 
+"use client";
+
 import React from "react";
 import { motion } from "framer-motion";
-import assets from "../assets";
+import { assets } from "../assets";
 import Image from "next/image";
 const Header = () => {
   return (
