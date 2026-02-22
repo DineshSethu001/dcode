@@ -2,7 +2,6 @@
 
 import Image from "next/image.js";
 import { assets, toolsData } from "../assets/index.js";
-import { infoList } from "../assets/index.js";
 import { motion } from "motion/react";
 
 const About = () => {
@@ -45,7 +44,7 @@ const About = () => {
           </p>
 
           <ul className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl">
-            {infoList.map(({ icon, title, description }, index) => (
+            {assets.infoList.map(({ icon, title, description }, index) => (
               <li
                 className="hover:bg-[var(--color-lightHover)] border-[0.5px] border-gray-400 p-6 rounded-xl cursor-pointer hover:-translate-y-1 duration-500 hover:shadow-[var(--shadow-black)]"
                 key={index}
