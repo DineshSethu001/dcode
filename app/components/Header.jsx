@@ -3,8 +3,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { assets } from "../assets";
-
+import { assets } from "@/app/assets";
 import Image from "next/image";
 const Header = () => {
   return (
