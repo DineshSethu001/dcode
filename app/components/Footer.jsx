@@ -2,18 +2,19 @@
 
 import React from "react";
 import Image from "next/image";
-import { assets } from "@/app/assets";
 import { Github, Linkedin, Mail, Phone } from "lucide-react";
 
 function Footer() {
   return (
-    <footer className="mt-24 bg-gradient-to-b ">
+    <footer className="mt-24 bg-gradient-to-b">
       {/* Top Section */}
       <div className="text-center px-6 py-14">
         <Image
-          src={assets.logo}
-          className="w-36 mx-auto mb-4"
+          src="/images/logo.png"
           alt="Logo"
+          width={144}
+          height={144}
+          className="mx-auto mb-4"
         />
 
         <p className="text-gray-600 max-w-xl mx-auto mb-6">
@@ -36,8 +37,11 @@ function Footer() {
       {/* Bottom Section */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-6 px-[10%] py-6">
         <p className="text-sm text-gray-600 text-center sm:text-left">
-          © 2026 <span className="font-semibold text-gray-800">Dinesh Codehunt</span>.  
-          All rights reserved.
+          © 2026{" "}
+          <span className="font-semibold text-gray-800">
+            Dinesh Codehunt
+          </span>
+          . All rights reserved.
         </p>
 
         {/* Social Links */}
@@ -46,6 +50,7 @@ function Footer() {
             <a
               href="https://github.com/DineshSethu001"
               target="_blank"
+              rel="noopener noreferrer"
               className="group flex items-center gap-2 text-gray-600 hover:text-black transition"
             >
               <Github className="w-5 h-5 group-hover:scale-110 transition-transform" />
@@ -57,6 +62,7 @@ function Footer() {
             <a
               href="https://www.linkedin.com/"
               target="_blank"
+              rel="noopener noreferrer"
               className="group flex items-center gap-2 text-gray-600 hover:text-[#0A66C2] transition"
             >
               <Linkedin className="w-5 h-5 group-hover:scale-110 transition-transform" />
@@ -68,6 +74,7 @@ function Footer() {
             <a
               href="https://wa.me/91XXXXXXXXXX"
               target="_blank"
+              rel="noopener noreferrer"
               className="group flex items-center gap-2 text-gray-600 hover:text-green-600 transition"
             >
               <Phone className="w-5 h-5 group-hover:scale-110 transition-transform" />

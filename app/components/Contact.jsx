@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { assets } from "@/app/assets";
+
 /* ---------------- Animations ---------------- */
 
 const fadeUp = {
@@ -71,12 +71,12 @@ function Contact() {
   return (
     <section
       id="contact"
-         style={{
-  backgroundImage: "url('/connect.png')",
-  backgroundPosition: "center",
-  backgroundRepeat: "no-repeat",
-  backgroundSize: "cover",
-}}
+      style={{
+        backgroundImage: "url('/connect.png')",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "cover",
+      }}
       className="relative overflow-hidden bg-[#F6F5F2] px-[12%] py-20"
     >
       {/* 🌊 Animated Background Blobs */}
@@ -108,7 +108,7 @@ function Contact() {
 
         {/* Form */}
         <form onSubmit={onSubmit} className="max-w-2xl mx-auto space-y-8">
-          {/* Floating Input */}
+          {/* Floating Inputs */}
           {["name", "email"].map((field, i) => (
             <div key={i} className="relative">
               <input
@@ -116,9 +116,9 @@ function Contact() {
                 name={field}
                 required
                 className="peer w-full bg-white/30 backdrop-blur-md
-           border border-white/40 rounded-md
-           px-4 py-3 text-gray-900
-           outline-none focus:border-[#132440]"
+                           border border-white/40 rounded-md
+                           px-4 py-3 text-gray-900
+                           outline-none focus:border-[#132440]"
               />
               <label
                 className="absolute left-4 top-3 text-gray-500 bg-white px-1
@@ -134,12 +134,12 @@ function Contact() {
           <div className="relative">
             <textarea
               name="message"
-              rows="5"
+              rows={5}
               required
               className="peer w-full bg-white/30 backdrop-blur-md
-           border border-white/40 rounded-md
-           px-4 py-3 text-gray-900
-           outline-none focus:border-[#132440]"
+                         border border-white/40 rounded-md
+                         px-4 py-3 text-gray-900
+                         outline-none focus:border-[#132440]"
             />
             <label
               className="absolute left-4 top-3 text-gray-500 bg-white px-1
@@ -161,7 +161,12 @@ function Contact() {
                          flex items-center gap-2 shadow-lg"
             >
               Submit
-              <Image src={assets.right_arrow_white} alt="" className="w-4" />
+              <Image
+                src="/images/right_arrow_white.png"
+                alt="Send"
+                width={16}
+                height={16}
+              />
             </motion.button>
           </div>
         </form>
@@ -175,14 +180,13 @@ function Contact() {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className={`fixed bottom-6 right-6 px-6 py-3 rounded-lg text-white shadow-lg
-              ${
-                toast.type === "success"
-                  ? "bg-green-600"
-                  : toast.type === "error"
-                  ? "bg-red-600"
-                  : "bg-blue-600"
-              }`}
+            className={`fixed bottom-6 right-6 px-6 py-3 rounded-lg text-white shadow-lg ${
+              toast.type === "success"
+                ? "bg-green-600"
+                : toast.type === "error"
+                ? "bg-red-600"
+                : "bg-blue-600"
+            }`}
           >
             {toast.message}
           </motion.div>

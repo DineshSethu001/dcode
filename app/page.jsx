@@ -1,9 +1,12 @@
 import { Suspense } from "react";
 import NavbarWrapper from "./components/NavbarWrapper";
-import { About, Services, Projects, Contact, Footer } from "./components";
-
-import { Experience} from "./components/Experience.jsx";
-import { Header } from "./components/Header.jsx";
+import {
+  Header,
+  About,
+  Projects,
+  Contact,
+  Footer,
+} from "./components";
 
 export default function Home() {
   return (
@@ -14,7 +17,6 @@ export default function Home() {
 
       <Header />
       <About />
-      <Experience />
       <Projects />
       <Contact />
       <Footer />
