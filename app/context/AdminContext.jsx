@@ -9,8 +9,8 @@ export function AdminProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // ✅ Change this to your admin email
-  const ADMIN_EMAIL = "dineshsethu15981@gmail.com";
+  // ✅ Read from env (CLIENT SAFE)
+  const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
 
   useEffect(() => {
     const checkSession = async () => {
@@ -29,7 +29,7 @@ export function AdminProvider({ children }) {
     checkSession();
 
     const { data: listener } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      (_event, session) => {
         const sessionUser = session?.user;
 
         if (sessionUser && sessionUser.email === ADMIN_EMAIL) {
@@ -43,7 +43,7 @@ export function AdminProvider({ children }) {
     return () => {
       listener.subscription.unsubscribe();
     };
-  }, []);
+  }, [ADMIN_EMAIL]);
 
   const login = async (email, password) => {
     const { data, error } = await supabase.auth.signInWithPassword({
