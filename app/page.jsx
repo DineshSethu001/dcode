@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import NavbarWrapper from "./components/NavbarWrapper";
 import { Suspense } from "react";
 import SearchParamsClient from "./components/SearchParamsClient";
