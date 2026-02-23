@@ -1,16 +1,13 @@
 "use client";
 
 import "./globals.css";
-import Providers from "./providers";
-
+import { AdminProvider } from "@/app/context/AdminContext";
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <Providers>
-          {children}
-        </Providers>
+        <AdminProvider>{children}</AdminProvider>
       </body>
     </html>
   );

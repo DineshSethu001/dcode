@@ -1,66 +1,50 @@
 "use client";
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import { supabase } from "../utils/supabase";
+import { createContext, useContext, useEffect, useState } from "react";
+import { supabase } from "@/app/utils/supabase";
 
-const AdminContext = createContext(null);
+const AdminContext = createContext();
 
 export function AdminProvider({ children }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // ✅ Read admin emails from env
-  const adminEmails = useMemo(() => {
-    return (process.env.NEXT_PUBLIC_ADMIN_EMAIL || "")
-      .split(",")
-      .map((email) => email.trim().toLowerCase())
-      .filter(Boolean);
-  }, []);
+  // ✅ Change this to your admin email
+  const ADMIN_EMAIL = "dineshsethu15981@gmail.com";
 
-  // ✅ Check whether session user is admin
-  const isAdminUser = useCallback(
-    (session) => {
-      const userEmail = session?.user?.email?.trim().toLowerCase();
-      if (!userEmail) return false;
-      return adminEmails.includes(userEmail);
-    },
-    [adminEmails]
-  );
-
-  // 🔄 Check session on page refresh + auth changes
   useEffect(() => {
-    let mounted = true;
-
-    const initSession = async () => {
+    const checkSession = async () => {
       const { data } = await supabase.auth.getSession();
-      if (!mounted) return;
+      const sessionUser = data?.session?.user;
 
-      setIsAuthenticated(isAdminUser(data.session));
+      if (sessionUser && sessionUser.email === ADMIN_EMAIL) {
+        setUser(sessionUser);
+      } else {
+        setUser(null);
+      }
+
       setIsLoading(false);
     };
 
-    initSession();
+    checkSession();
 
     const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setIsAuthenticated(isAdminUser(session));
+      async (_event, session) => {
+        const sessionUser = session?.user;
+
+        if (sessionUser && sessionUser.email === ADMIN_EMAIL) {
+          setUser(sessionUser);
+        } else {
+          setUser(null);
+        }
       }
     );
 
     return () => {
-      mounted = false;
       listener.subscription.unsubscribe();
     };
-  }, [isAdminUser]);
+  }, []);
 
-  // 🔐 Admin login (Supabase)
   const login = async (email, password) => {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
@@ -71,43 +55,27 @@ export function AdminProvider({ children }) {
       return { success: false, error: error.message };
     }
 
-    const userEmail = data?.user?.email?.trim().toLowerCase();
-
-    // 🔒 Allow only admin emails
-    if (!adminEmails.includes(userEmail)) {
+    if (data.user.email !== ADMIN_EMAIL) {
       await supabase.auth.signOut();
       return { success: false, error: "Access denied" };
     }
 
-    setIsAuthenticated(true);
+    setUser(data.user);
     return { success: true };
   };
 
-  // 🚪 Logout
   const logout = async () => {
     await supabase.auth.signOut();
-    setIsAuthenticated(false);
+    setUser(null);
   };
 
   return (
-    <AdminContext.Provider
-      value={{
-        login,
-        logout,
-        isAuthenticated,
-        isLoading,
-      }}
-    >
+    <AdminContext.Provider value={{ user, login, logout, isLoading }}>
       {children}
     </AdminContext.Provider>
   );
 }
 
-// ✅ Safe hook
 export function useAdmin() {
-  const context = useContext(AdminContext);
-  if (!context) {
-    throw new Error("useAdmin must be used inside <AdminProvider>");
-  }
-  return context;
+  return useContext(AdminContext);
 }
