@@ -5,7 +5,7 @@ import Image from "next/image";
 
 const Header = () => {
   return (
-    <section
+    <section id="home"
       className="
         bg-[#F6F5F2]
         mx-auto

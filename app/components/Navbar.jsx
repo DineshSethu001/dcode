@@ -1,10 +1,187 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
+import Link from "next/link";
+import { Menu, X, LogIn } from "lucide-react";
+import { routes } from "@/app/router/routes";
+
+/* 🧲 Magnetic Hook */
+const useMagnetic = () => {
+  const ref = useRef(null);
+
+  const onMove = (e) => {
+    if (window.innerWidth < 768) return;
+    const el = ref.current;
+    if (!el) return;
+
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+
+    el.style.transform = `translate(${x * 0.15}px, ${y * 0.15}px)`;
+  };
+
+  const reset = () => {
+    if (ref.current) {
+      ref.current.style.transform = "translate(0,0)";
+    }
+  };
+
+  return { ref, onMove, reset };
+};
 
 export default function Navbar() {
-  const searchParams = useSearchParams();
-  const section = searchParams.get("section");
+  const [active, setActive] = useState("home");
+  const [progress, setProgress] = useState(0);
+  const [open, setOpen] = useState(false);
+  const [showBar, setShowBar] = useState(false);
+  const [visible, setVisible] = useState(true);
 
-  return <nav>{section}</nav>;
+  const lastScrollY = useRef(0);
+  const scrollTimeout = useRef(null);
+
+  useEffect(() => {
+    const sectionIds = routes.map(r => r.href.replace("#", ""));
+
+    const onScroll = () => {
+      const currentY = window.scrollY;
+
+      /* Hide / Show Navbar */
+      if (currentY > lastScrollY.current && currentY > 100) {
+        setVisible(false);
+      } else {
+        setVisible(true);
+      }
+      lastScrollY.current = currentY;
+
+      /* Progress Bar */
+      setShowBar(true);
+      clearTimeout(scrollTimeout.current);
+      scrollTimeout.current = setTimeout(() => setShowBar(false), 900);
+
+      const height =
+        document.documentElement.scrollHeight -
+        document.documentElement.clientHeight;
+
+      setProgress((currentY / height) * 100);
+
+      for (const id of sectionIds) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        const rect = el.getBoundingClientRect();
+        if (rect.top <= 120 && rect.bottom >= 120) {
+          setActive(id);
+          break;
+        }
+      }
+    };
+
+    onScroll();
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  return (
+    <>
+      {/* 🧭 Progress Bar */}
+      <AnimatePresence>
+        {showBar && (
+          <motion.div className="fixed top-0 left-0 w-full h-[3px] z-[60]">
+            <motion.div
+              className="h-full"
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 0.25 }}
+              style={{
+                background:
+                  "linear-gradient(90deg, var(--react-blue), var(--primary))",
+                boxShadow: "0 0 10px var(--react-blue)",
+              }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Navbar */}
+      <motion.header
+        animate={{ y: visible ? 0 : -80 }}
+        transition={{ duration: 0.3 }}
+        className="fixed top-[3px] left-0 w-full z-50 bg-white/70 backdrop-blur-xl border-b border-gray-200"
+      >
+        <nav className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+
+          {/* Logo */}
+          <a href="#home" className="flex items-center gap-2">
+            <Image src="/images/logo.png" alt="Logo" width={36} height={36} />
+            <span className="logo-gradient font-semibold text-lg">
+              Dinesh
+            </span>
+          </a>
+
+          {/* Desktop Nav */}
+          <ul className="hidden md:flex gap-8">
+            {routes.map((r) => {
+              const id = r.href.replace("#", "");
+              const magnet = useMagnetic();
+
+              return (
+                <li key={r.label}>
+                  <a
+                    ref={magnet.ref}
+                    href={r.href}
+                    onMouseMove={magnet.onMove}
+                    onMouseLeave={magnet.reset}
+                    className="relative text-sm font-medium transition"
+                    style={{
+                      color:
+                        active === id
+                          ? "var(--react-blue)"
+                          : "#6b7280",
+                    }}
+                  >
+                    {r.label}
+
+                    {active === id && (
+                      <motion.span
+                        layoutId="underline"
+                        className="absolute -bottom-1 left-0 h-[2px] w-full"
+                        style={{
+                          background:
+                            "linear-gradient(90deg, var(--react-blue), var(--primary))",
+                        }}
+                      />
+                    )}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+
+          {/* Actions */}
+          <div className="flex gap-3">
+            <a
+              href="#contact"
+              className="px-4 py-2 border border-black rounded-full hover:bg-black hover:text-white transition"
+            >
+              Hire Me
+            </a>
+
+            <Link
+              href="/admin/login"
+              className="flex items-center gap-2 px-4 py-2 text-white rounded-full"
+              style={{ background: "var(--primary-gradient)" }}
+            >
+              <LogIn size={16} />
+              Admin
+            </Link>
+
+            <button onClick={() => setOpen(true)} className="md:hidden">
+              <Menu />
+            </button>
+          </div>
+        </nav>
+      </motion.header>
+    </>
+  );
 }

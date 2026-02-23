@@ -149,7 +149,7 @@ const Projects = () => {
   };
 
   return (
-    <>
+    <div id="projects" >
       {/* ---------- MODAL ---------- */}
       {(modalLoading || selectedProject) && (
         <div
@@ -312,7 +312,7 @@ const Projects = () => {
           </div>
         </div>
       </section>
-    </>
+    </div>
   );
 };
 
