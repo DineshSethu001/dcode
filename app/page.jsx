@@ -1,5 +1,7 @@
+import NavbarWrapper from "./components/NavbarWrapper";
 import { Suspense } from "react";
-import SearchParamsClient from "@/components/SearchParamsClient";
+import SearchParamsClient from "./components/SearchParamsClient";
+
 import {
   Header,
   About,
@@ -11,9 +13,11 @@ import {
 export default function Home() {
   return (
     <>
-     <Suspense fallback={<div>Loading...</div>}>
-      <SearchParamsClient />
-    </Suspense>
+      <NavbarWrapper />   {/* ✅ THIS WAS MISSING */}
+
+      <Suspense fallback={<div>Loading...</div>}>
+        <SearchParamsClient />
+      </Suspense>
 
       <Header />
       <About />
