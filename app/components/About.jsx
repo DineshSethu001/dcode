@@ -42,8 +42,7 @@ const About = () => {
           </p>
 
           <p className="mb-10 max-w-2xl font-semibold text-indigo-700 bg-indigo-100 inline-block px-4 py-2 rounded-lg">
-            I will build your SaaS frontend with React + Tailwind
-          </p>
+I enjoy building clean UI, solving real problems, and helping startups launch faster.          </p>
 
           {/* Info Cards */}
           <ul className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl">

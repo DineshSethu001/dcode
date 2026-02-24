@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 import NavbarWrapper from "./components/NavbarWrapper";
 import { Suspense } from "react";
 import SearchParamsClient from "./components/SearchParamsClient";
-
+import Service from "./components/Service";
 import {
   Header,
   About,
@@ -23,6 +23,9 @@ export default function Home() {
 
       <Header />
       <About />
+      
+      
+      <Service />
       <Projects />
       <Contact />
       <Footer />

@@ -114,25 +114,11 @@ const Header = () => {
         <span className="text-[#61DAFB]">R</span>
         <span className="text-[#3C873A] mr-2">N</span>
         <span className="text-gray-700 font-medium">
-          Stack Developer Based in India
+         Stack Developer building fast, scalable web apps for startups & businesses
         </span>
       </h1>
 
-      {/* Description */}
-      <p
-        className="
-          max-w-xl
-          sm:max-w-2xl
-          font-ovo
-          text-gray-700
-          text-sm
-          sm:text-base
-          md:text-lg
-        "
-      >
-        I am a MERN Full Stack Developer based in Vellore, India with 1.5+ years
-        of experience building scalable web solutions.
-      </p>
+      
 
       {/* CTA Buttons */}
       <div

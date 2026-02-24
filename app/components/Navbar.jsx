@@ -115,7 +115,7 @@ export default function Navbar() {
           <a href="#home" className="flex items-center gap-2">
             <Image src="/images/logo.png" alt="Logo" width={36} height={36} />
             <span className="logo-gradient font-semibold text-2xl">
-              Dinesh
+              Dinesh Thanigaivel
             </span>
           </a>
 

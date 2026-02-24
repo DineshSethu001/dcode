@@ -18,8 +18,7 @@ function Footer() {
         />
 
         <p className="text-gray-600 max-w-xl mx-auto mb-6">
-          Building modern, scalable, and user-focused web experiences using
-          React, Node.js, and clean UI design.
+          Available for freelance & full-time opportunities
         </p>
 
         {/* Contact */}

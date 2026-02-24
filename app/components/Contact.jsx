@@ -103,8 +103,7 @@ function Contact() {
         <h2 className="text-center text-4xl font-semibold">Get In Touch</h2>
 
         <p className="mt-5 mb-12 max-w-2xl mx-auto text-center text-gray-600">
-          Have a project, idea, or feedback? Let’s talk.
-        </p>
+Have a project in mind? Let’s build something great together.        </p>
 
         {/* Form */}
         <form onSubmit={onSubmit} className="max-w-2xl mx-auto space-y-8">
