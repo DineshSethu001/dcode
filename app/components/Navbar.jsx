@@ -114,7 +114,7 @@ export default function Navbar() {
           {/* Logo */}
           <a href="#home" className="flex items-center gap-2">
             <Image src="/images/logo.png" alt="Logo" width={36} height={36} />
-            <span className="logo-gradient font-semibold text-lg">
+            <span className="logo-gradient text-wider font-semibold text-2xl">
               Dinesh
             </span>
           </a>
@@ -136,8 +136,8 @@ export default function Navbar() {
                     style={{
                       color:
                         active === id
-                          ? "var(--react-blue)"
-                          : "#6b7280",
+                          ? "#8A7650"
+                          : "#562F00",
                     }}
                   >
                     {r.label}
@@ -160,21 +160,41 @@ export default function Navbar() {
 
           {/* Actions */}
           <div className="flex gap-3">
-            <a
-              href="#contact"
-              className="px-4 py-2 border border-black rounded-full hover:bg-black hover:text-white transition"
-            >
-              Hire Me
-            </a>
-
-            <Link
-              href="/admin/login"
-              className="flex items-center gap-2 px-4 py-2 text-white rounded-full"
-              style={{ background: "var(--primary-gradient)" }}
-            >
-              <LogIn size={16} />
-              Admin
-            </Link>
+<a
+  href="#contact"
+  className="relative inline-flex items-center justify-center
+             px-6 py-3 font-semibold bg-[#117554]
+             text-white
+             rounded-full
+             border border-[#00ED64]
+             transition-all duration-300
+             hover:scale-105 active:scale-95
+             hover:text-[#117554] hover:bg-white
+             before:absolute before:inset-0 before:rounded-full
+             before:border before:border-[#00ED64]
+             before:opacity-0
+             before:transition-opacity before:duration-300
+             hover:before:opacity-100
+             hover:before:shadow-[0_0_18px_rgba(0,237,100,0.55)]
+             before:pointer-events-none"
+>
+Hire Me →
+</a>
+          <Link
+  href="/admin/login"
+  className="relative inline-flex items-center gap-2
+             px-5 py-2 font-medium
+             text-[#117554]
+             rounded-full
+             border border-[#00ED64]
+             transition-all duration-300
+             hover:bg-[#117554] hover:text-[#FFF4EA]
+             hover:shadow-[0_0_15px_rgba(0,237,100,0.5)]
+             hover:scale-105 active:scale-95"
+>
+  <LogIn size={16} />
+  Admin
+</Link>
 
             <button onClick={() => setOpen(true)} className="md:hidden">
               <Menu />

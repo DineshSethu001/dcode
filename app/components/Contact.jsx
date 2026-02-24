@@ -72,7 +72,7 @@ function Contact() {
     <section
       id="contact"
       style={{
-        backgroundImage: "url('/connect.png')",
+  backgroundImage: "url('/images/connect.png')",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
         backgroundSize: "cover",
@@ -118,12 +118,12 @@ function Contact() {
                 className="peer w-full bg-white/30 backdrop-blur-md
                            border border-white/40 rounded-md
                            px-4 py-3 text-gray-900
-                           outline-none focus:border-[#132440]"
+                           outline-none focus:border-[#1C0770]"
               />
               <label
-                className="absolute left-4 top-3 text-gray-500 bg-white px-1
+                className="absolute left-4 top-3 text-[#8100D1] font-medium bg-white/30 backdrop-blur-md px-2
                            transition-all peer-focus:-top-2 peer-focus:text-xs
-                           peer-valid:-top-2 peer-valid:text-xs"
+                           peer-valid:-top-2 peer-valid:text-xs peer-focus:font-medium"
               >
                 {field === "name" ? "Your Name" : "Your Email"}
               </label>
@@ -139,12 +139,12 @@ function Contact() {
               className="peer w-full bg-white/30 backdrop-blur-md
                          border border-white/40 rounded-md
                          px-4 py-3 text-gray-900
-                         outline-none focus:border-[#132440]"
+                         outline-none focus:border-[#1C0770]"
             />
             <label
-              className="absolute left-4 top-3 text-gray-500 bg-white px-1
-                         transition-all peer-focus:-top-2 peer-focus:text-xs
-                         peer-valid:-top-2 peer-valid:text-xs"
+              className="absolute left-4 top-3 text-[#8100D1] px-2
+                         transition-all peer-focus:-top-2 peer-focus:text-xs peer-focus:font-medium
+                         peer-valid:-top-2 peer-valid:text-xl font-medium bg-white/30 backdrop-blur-md"
             >
               Your Message
             </label>
@@ -157,7 +157,7 @@ function Contact() {
               onMouseMove={magnetic.handleMove}
               onMouseLeave={magnetic.reset}
               whileTap={{ scale: 0.9 }}
-              className="relative px-8 py-3 bg-[#132440] text-white rounded-full
+              className="relative px-8 py-3 bg-[#1C0770] text-white rounded-full
                          flex items-center gap-2 shadow-lg"
             >
               Submit
