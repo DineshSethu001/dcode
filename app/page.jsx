@@ -11,6 +11,11 @@ import {
   Contact,
   Footer,
 } from "./components";
+export const metadata = {
+  title: "About Dinesh Thanigaivel | MERN Stack Developer",
+  description:
+    "Learn more about Dinesh Thanigaivel, a MERN Stack Developer with experience in React, Node.js, and scalable web apps."
+};
 
 export default function Home() {
   return (
@@ -23,8 +28,6 @@ export default function Home() {
 
       <Header />
       <About />
-      
-      
       <Service />
       <Projects />
       <Contact />
