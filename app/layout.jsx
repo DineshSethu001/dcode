@@ -1,7 +1,6 @@
-"use client";
-
 import "./globals.css";
-import { AdminProvider } from "@/app/context/AdminContext";
+import Providers from "./providers";
+
 export const metadata = {
   title: "Dinesh Thanigaivel | MERN Stack Developer in India",
   description:
@@ -10,34 +9,32 @@ export const metadata = {
     "MERN Stack Developer",
     "React Developer India",
     "Node.js Developer",
-    "Full Stack Developer"
+    "Full Stack Developer",
   ],
   authors: [{ name: "Dinesh Thanigaivel" }],
   robots: "index, follow",
   openGraph: {
     title: "Dinesh Thanigaivel | MERN Stack Developer",
-    description:
-      "Full Stack MERN Developer building scalable web applications.",
+    description: "Full Stack MERN Developer building scalable web applications.",
     url: "https://yourdomain.com",
     siteName: "Dinesh Portfolio",
     images: [
       {
         url: "https://yourdomain.com/preview.png",
         width: 1200,
-        height: 630
-      }
+        height: 630,
+      },
     ],
-    type: "website"
-  }
+    type: "website",
+  },
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <AdminProvider>{children}</AdminProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
 }
-

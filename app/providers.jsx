@@ -1,6 +1,6 @@
 "use client";
 
-import { AdminProvider } from "./context/AdminContext";
+import { AdminProvider } from "@/app/context/AdminContext";
 
 export default function Providers({ children }) {
   return <AdminProvider>{children}</AdminProvider>;

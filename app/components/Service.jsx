@@ -24,7 +24,7 @@ const Service = () => {
   }
 ];
   return (
-    <section className="py-20 bg-[#f8f8f6]" id="services">
+    <section className="py-20 bg-[var(--primary-color)]" id="services">
   <div className="max-w-6xl mx-auto px-6">
     <h2 className="text-3xl font-semibold text-center mb-4">
       What I Can Help You With

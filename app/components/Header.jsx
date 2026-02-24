@@ -7,7 +7,7 @@ const Header = () => {
   return (
     <section id="home"
       className="
-        bg-[#F6F5F2]
+        bg-[var(--primary-color)]
         mx-auto
         min-h-screen
         flex flex-col
@@ -144,7 +144,8 @@ const Header = () => {
         >
           Contact Me
           <Image
-            src="/images/right-arrow-white.png"
+          className="text-bold"
+            src="/images/right-arrow.png"
             alt="Contact"
             width={16}
             height={16}

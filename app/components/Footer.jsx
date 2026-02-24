@@ -6,7 +6,7 @@ import { Github, Linkedin, Mail, Phone } from "lucide-react";
 
 function Footer() {
   return (
-    <footer className="mt-24 bg-gradient-to-b">
+    <footer className="bg-[var(--secondary-color)] mt-24 bg-gradient-to-b">
       {/* Top Section */}
       <div className="text-center px-6 py-14">
         <Image

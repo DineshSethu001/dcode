@@ -9,7 +9,7 @@ const About = () => {
   return (
     <section
       id="about"
-      className="bg-[#F0EBE3] w-full px-[12%] py-10 scroll-mt-20"
+      className="bg-[var(--secondary-color)] w-full px-[12%] py-10 scroll-mt-20"
     >
       <h4 className="text-center mb-2 font-ovo text-lg">Introduction</h4>
       <h2 className="text-4xl text-center">About me</h2>

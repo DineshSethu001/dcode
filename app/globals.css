@@ -4,27 +4,28 @@
 
 @import "tailwindcss";
 
-@theme {
+
+:root {
+  /* Fonts */
   --font-outfit: "Outfit", system-ui, sans-serif;
   --font-ovo: "Ovo", serif;
 
+  /* Colors */
   --color-lightHover: #fcf4ff;
   --color-darkHover: #2a004a;
   --color-darkTheme: #11001F;
-  
+
+  --primary: #6CA651;
+  --primary-dark: #4e8c3c;
+  --primary-gradient: linear-gradient(135deg, #6CA651, #4e8c3c);
+  --primary-color: #EEE6CA;
+  --secondary-color: #FBF9D1;
+  --react-blue: #61DAFB;
 
   /* Shadows */
   --shadow-black: 4px 4px 0 #000;
   --shadow-white: 4px 4px 0 #fff;
 }
-:root {
-  --primary: #6CA651;
-  --primary-dark: #4e8c3c;
-  --primary-gradient: linear-gradient(135deg, #6CA651, #4e8c3c);
-
-  --react-blue: #61DAFB;
-}
-
 * {
   font-family: 'Poppins', 'Quicksand', sans-serif;
 }
