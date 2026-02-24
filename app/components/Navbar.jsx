@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { Menu, X, LogIn } from "lucide-react";
+import { Menu, LogIn } from "lucide-react";
 import { routes } from "@/app/router/routes";
 
 /* 🧲 Magnetic Hook */
@@ -39,16 +39,18 @@ export default function Navbar() {
   const [showBar, setShowBar] = useState(false);
   const [visible, setVisible] = useState(true);
 
+  // 👉 NEW STATE
+  const [contactOpen, setContactOpen] = useState(false);
+
   const lastScrollY = useRef(0);
   const scrollTimeout = useRef(null);
 
   useEffect(() => {
-    const sectionIds = routes.map(r => r.href.replace("#", ""));
+    const sectionIds = routes.map((r) => r.href.replace("#", ""));
 
     const onScroll = () => {
       const currentY = window.scrollY;
 
-      /* Hide / Show Navbar */
       if (currentY > lastScrollY.current && currentY > 100) {
         setVisible(false);
       } else {
@@ -56,7 +58,6 @@ export default function Navbar() {
       }
       lastScrollY.current = currentY;
 
-      /* Progress Bar */
       setShowBar(true);
       clearTimeout(scrollTimeout.current);
       scrollTimeout.current = setTimeout(() => setShowBar(false), 900);
@@ -110,11 +111,10 @@ export default function Navbar() {
         className="fixed top-[3px] left-0 w-full z-50 bg-white/70 backdrop-blur-xl border-b border-gray-200"
       >
         <nav className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-
           {/* Logo */}
           <a href="#home" className="flex items-center gap-2">
             <Image src="/images/logo.png" alt="Logo" width={36} height={36} />
-            <span className="logo-gradient text-wider font-semibold text-2xl">
+            <span className="logo-gradient font-semibold text-2xl">
               Dinesh
             </span>
           </a>
@@ -134,14 +134,10 @@ export default function Navbar() {
                     onMouseLeave={magnet.reset}
                     className="relative text-sm font-medium transition"
                     style={{
-                      color:
-                        active === id
-                          ? "#8A7650"
-                          : "#562F00",
+                      color: active === id ? "#8A7650" : "#562F00",
                     }}
                   >
                     {r.label}
-
                     {active === id && (
                       <motion.span
                         layoutId="underline"
@@ -160,41 +156,43 @@ export default function Navbar() {
 
           {/* Actions */}
           <div className="flex gap-3">
-<a
-  href="#contact"
-  className="relative inline-flex items-center justify-center
-             px-6 py-3 font-semibold bg-[#117554]
-             text-white
-             rounded-full
-             border border-[#00ED64]
-             transition-all duration-300
-             hover:scale-105 active:scale-95
-             hover:text-[#117554] hover:bg-white
-             before:absolute before:inset-0 before:rounded-full
-             before:border before:border-[#00ED64]
-             before:opacity-0
-             before:transition-opacity before:duration-300
-             hover:before:opacity-100
-             hover:before:shadow-[0_0_18px_rgba(0,237,100,0.55)]
-             before:pointer-events-none"
->
-Hire Me →
-</a>
-          <Link
-  href="/admin/login"
-  className="relative inline-flex items-center gap-2
-             px-5 py-2 font-medium
-             text-[#117554]
-             rounded-full
-             border border-[#00ED64]
-             transition-all duration-300
-             hover:bg-[#117554] hover:text-[#FFF4EA]
-             hover:shadow-[0_0_15px_rgba(0,237,100,0.5)]
-             hover:scale-105 active:scale-95"
->
-  <LogIn size={16} />
-  Admin
-</Link>
+            {/* Hire Me */}
+            <button
+              onClick={() => setContactOpen(true)}
+              className="relative inline-flex items-center justify-center
+                         px-6 py-3 font-semibold bg-[#117554]
+                         text-white rounded-full
+                         border border-[#00ED64]
+                         transition-all duration-300
+                         hover:scale-105 active:scale-95
+                         hover:text-[#117554] hover:bg-white
+                         before:absolute before:inset-0 before:rounded-full
+                         before:border before:border-[#00ED64]
+                         before:opacity-0
+                         before:transition-opacity before:duration-300
+                         hover:before:opacity-100
+                         hover:before:shadow-[0_0_18px_rgba(0,237,100,0.55)]
+                         before:pointer-events-none"
+            >
+              Hire Me →
+            </button>
+
+            {/* Admin */}
+            <Link
+              href="/admin/login"
+              className="relative inline-flex items-center gap-2
+                         px-5 py-2 font-medium
+                         text-[#117554]
+                         rounded-full
+                         border border-[#00ED64]
+                         transition-all duration-300
+                         hover:bg-[#117554] hover:text-[#FFF4EA]
+                         hover:shadow-[0_0_15px_rgba(0,237,100,0.5)]
+                         hover:scale-105 active:scale-95"
+            >
+              <LogIn size={16} />
+              Admin
+            </Link>
 
             <button onClick={() => setOpen(true)} className="md:hidden">
               <Menu />
@@ -202,6 +200,64 @@ Hire Me →
           </div>
         </nav>
       </motion.header>
+
+      {/* 📩 Contact Modal */}
+      <AnimatePresence>
+        {contactOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60"
+            onClick={() => setContactOpen(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-[90%] max-w-sm rounded-2xl bg-white p-6 text-center"
+            >
+              <h3 className="text-lg font-semibold text-[#117554] mb-2">
+                Let’s connect
+              </h3>
+              <p className="text-sm text-gray-500 mb-6">
+                How would you like to contact me?
+              </p>
+
+              <div className="flex gap-4">
+                <a
+                  href="mailto:dineshsethu15981@gmail.com?subject=Hiring Inquiry"
+                  className="flex-1 py-3 rounded-xl
+                             border border-[#00ED64]
+                             text-[#117554] font-medium
+                             transition hover:bg-[#117554] hover:text-white"
+                >
+                  📧 Email
+                </a>
+
+                <a
+                  href="https://wa.me/917339572897?text=Hi,%20I%20want%20to%20hire%20you"
+                  target="_blank"
+                  className="flex-1 py-3 rounded-xl
+                             bg-[#00ED64] text-black font-medium
+                             transition hover:shadow-[0_0_15px_rgba(0,237,100,0.5)]"
+                >
+                  💬 WhatsApp
+                </a>
+              </div>
+
+              <button
+                onClick={() => setContactOpen(false)}
+                className="mt-6 text-sm text-gray-400 hover:text-gray-600"
+              >
+                Cancel
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
