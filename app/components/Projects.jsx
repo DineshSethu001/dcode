@@ -6,7 +6,9 @@ import { supabase } from "../utils/supabase";
 
 const AUTO_SCROLL_SPEED = 3;
 const EDGE_ZONE = 60;
-
+export const metadata = {
+  title: "My Projects ",
+};
 /* ---------- Skeleton Card ---------- */
 const SkeletonCard = () => (
   <div className="min-w-[320px] max-w-[320px] bg-white rounded-2xl shadow-md overflow-hidden animate-pulse">

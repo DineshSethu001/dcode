@@ -12,7 +12,7 @@ import {
   Footer,
 } from "./components";
 export const metadata = {
-  title: "About Dinesh Thanigaivel | MERN Stack Developer",
+  title: "Dcoder",
   description:
     "Learn more about Dinesh Thanigaivel, a MERN Stack Developer with experience in React, Node.js, and scalable web apps."
 };

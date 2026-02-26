@@ -2,7 +2,7 @@ import "./globals.css";
 import Providers from "./providers";
 
 export const metadata = {
-  title: "Dinesh Thanigaivel | MERN Stack Developer in India",
+  title: "Dcoder",
   description:
     "Dinesh Thanigaivel is a MERN Stack Developer specializing in React, Node.js, MongoDB, Express, and Tailwind CSS.",
   keywords: [
